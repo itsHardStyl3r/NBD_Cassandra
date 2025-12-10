@@ -1,0 +1,21 @@
+services:
+  cassandra-node1:
+    image: cassandra:5.0.6
+    container_name: cassandra-node1
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=LibraryCluster
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    networks:
+      - cassandra-net
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+networks:
+  cassandra-net:
+    driver: bridge
