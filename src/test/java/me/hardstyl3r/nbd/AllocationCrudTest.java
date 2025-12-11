@@ -47,4 +47,28 @@ class AllocationCrudTest extends BaseDatabaseTest {
         allocationDao.delete(updated);
         assertNull(allocationDao.findById(clientId, allocationId));
     }
+
+    @Test
+    void testAllocationList() {
+        UUID clientId = UUID.randomUUID();
+        Allocation alloc1 = new Allocation(clientId, UUID.randomUUID(), UUID.randomUUID(), "Book 1", "Kowalski", Instant.now());
+        Allocation alloc2 = new Allocation(clientId, UUID.randomUUID(), UUID.randomUUID(), "Book 2", "Kowalski", Instant.now());
+
+        allocationDao.save(alloc1);
+        allocationDao.save(alloc2);
+
+        var allocations = allocationDao.findAllByClientId(clientId);
+
+        int count = 0;
+        for (Allocation a : allocations) {
+            assertEquals(clientId, a.getClientId());
+            count++;
+        }
+
+        assertEquals(2, count, "Should find exactly 2 allocations for this client");
+
+        // Cleanup
+        allocationDao.delete(alloc1);
+        allocationDao.delete(alloc2);
+    }
 }
