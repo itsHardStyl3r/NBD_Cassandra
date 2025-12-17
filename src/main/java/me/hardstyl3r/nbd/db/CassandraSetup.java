@@ -9,7 +9,7 @@ public class CassandraSetup {
         System.out.println("Keyspace 'library' dropped.");
 
         session.execute("CREATE KEYSPACE library " +
-                "WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};");
+                "WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};");
 
         System.out.println("Keyspace 'library' created.");
 

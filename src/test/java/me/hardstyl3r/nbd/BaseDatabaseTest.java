@@ -7,7 +7,6 @@ import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import me.hardstyl3r.nbd.db.CassandraSetup;
 import me.hardstyl3r.nbd.mappers.LibraryMapper;
 import me.hardstyl3r.nbd.mappers.LibraryMapperBuilder;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -31,6 +30,8 @@ public abstract class BaseDatabaseTest {
 
             session = CqlSession.builder()
                     .addContactPoint(new InetSocketAddress("127.0.0.1", 9042))
+                    .addContactPoint(new InetSocketAddress("127.0.0.1", 9043))
+                    .withAuthCredentials("cassandra", "cassandra")
                     .withLocalDatacenter("datacenter1")
                     .withConfigLoader(loader)
                     .build();

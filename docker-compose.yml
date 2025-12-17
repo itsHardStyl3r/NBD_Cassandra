@@ -1,21 +1,42 @@
 services:
-  cassandra-node1:
-    image: cassandra:5.0.6
-    container_name: cassandra-node1
+  cassandra:
+    image: localhost/my-cassandra:5.0
     ports:
-      - "9042:9042"
+      - 7000:7000
+      - 9042:9042
+    volumes:
+      - cassandra_data:/bitnami/cassandra
     environment:
-      - CASSANDRA_CLUSTER_NAME=LibraryCluster
-      - CASSANDRA_DC=datacenter1
-      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
-    networks:
-      - cassandra-net
+      - CASSANDRA_SEEDS=cassandra,cassandra2
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_PASSWORD=cassandra
+      - MAX_HEAP_SIZE=2G
+      - HEAP_NEWSIZE=200M
     healthcheck:
-      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
-      interval: 15s
+      test: ["CMD-SHELL", "nodetool status"]
+      interval: 30s
       timeout: 10s
-      retries: 10
+      retries: 5
 
-networks:
-  cassandra-net:
-    driver: bridge
+  cassandra2:
+    image: localhost/my-cassandra:5.0
+    ports:
+      - 7001:7000
+      - 9043:9042
+    volumes:
+      - cassandra2_data:/bitnami/cassandra
+    depends_on:
+      - cassandra
+    environment:
+      - CASSANDRA_SEEDS=cassandra,cassandra2
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_PASSWORD=cassandra
+      - MAX_HEAP_SIZE=2G
+      - HEAP_NEWSIZE=200M
+
+volumes:
+  cassandra_data:
+    driver: local
+  cassandra2_data:
+    driver: local
