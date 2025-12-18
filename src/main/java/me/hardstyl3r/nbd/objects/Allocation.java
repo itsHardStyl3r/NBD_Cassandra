@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@CqlName("allocations_by_client") // Jawnie wskazujemy nazwę tabeli
+@CqlName("allocations_by_client")
 public class Allocation {
 
     @PartitionKey

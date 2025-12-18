@@ -7,6 +7,12 @@ import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import me.hardstyl3r.nbd.db.CassandraSetup;
 import me.hardstyl3r.nbd.mappers.LibraryMapper;
 import me.hardstyl3r.nbd.mappers.LibraryMapperBuilder;
+import me.hardstyl3r.nbd.managers.AllocationManager;
+import me.hardstyl3r.nbd.managers.ClientManager;
+import me.hardstyl3r.nbd.managers.ResourceManager;
+import me.hardstyl3r.nbd.repositories.AllocationRepository;
+import me.hardstyl3r.nbd.repositories.ClientRepository;
+import me.hardstyl3r.nbd.repositories.ResourceRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -18,6 +24,10 @@ public abstract class BaseDatabaseTest {
     protected static CqlSession session;
     protected static LibraryMapper mapper;
     protected static CqlIdentifier keyspaceId;
+
+    protected static ClientManager clientManager;
+    protected static ResourceManager resourceManager;
+    protected static AllocationManager allocationManager;
 
     private static boolean initialized = false;
 
@@ -40,6 +50,15 @@ public abstract class BaseDatabaseTest {
 
             keyspaceId = CqlIdentifier.fromCql("library");
             mapper = new LibraryMapperBuilder(session).build();
+
+            ClientRepository clientRepository = new ClientRepository(mapper.clientDao(keyspaceId));
+            ResourceRepository resourceRepository = new ResourceRepository(mapper.resourceDao(keyspaceId));
+            AllocationRepository allocationRepository = new AllocationRepository(mapper.allocationDao(keyspaceId));
+
+            clientManager = new ClientManager(clientRepository);
+            resourceManager = new ResourceManager(resourceRepository);
+            allocationManager = new AllocationManager(allocationRepository, clientRepository, resourceRepository);
+
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 if (session != null) {
